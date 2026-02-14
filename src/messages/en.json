@@ -1,0 +1,206 @@
+{
+  "common": {
+    "appName": "Libraria",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search...",
+    "noResults": "No results found",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "library": "Library",
+    "librarian": "Librarian",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signInWithGoogle": "Sign in with Google",
+    "signOut": "Sign out",
+    "welcome": "Welcome to Libraria",
+    "tagline": "Your AI-powered Second Brain for media tracking"
+  },
+  "landing": {
+    "hero": {
+      "title": "Your Intelligent Media Vault",
+      "subtitle": "Track, organize, and explore your books, comics, movies, games, and music — powered by AI.",
+      "cta": "Get Started with Google"
+    },
+    "features": {
+      "title": "Everything you need",
+      "media": {
+        "title": "Media Management",
+        "description": "Track books, comics, movies, games, and music in one place."
+      },
+      "collections": {
+        "title": "Smart Collections",
+        "description": "Organize your media into custom collections with color coding."
+      },
+      "ai": {
+        "title": "AI Agent",
+        "description": "Natural language interaction for all operations — search, filter, manage."
+      },
+      "analytics": {
+        "title": "Visual Analytics",
+        "description": "Insights into your media consumption patterns with charts."
+      },
+      "search": {
+        "title": "Semantic Search",
+        "description": "Find media by meaning, not just keywords, using AI embeddings."
+      },
+      "privacy": {
+        "title": "Privacy First",
+        "description": "Bring your own API keys. Your data stays yours."
+      }
+    }
+  },
+  "library": {
+    "title": "Library",
+    "addMedia": "Add Media",
+    "viewGrid": "Grid View",
+    "viewList": "List View",
+    "filters": "Filters",
+    "sort": "Sort",
+    "sortBy": {
+      "titleAsc": "Title (A-Z)",
+      "titleDesc": "Title (Z-A)",
+      "ratingHigh": "Rating (High-Low)",
+      "ratingLow": "Rating (Low-High)",
+      "updatedNew": "Last Updated (Newest)",
+      "updatedOld": "Last Updated (Oldest)"
+    },
+    "pagination": {
+      "page": "Page",
+      "of": "of",
+      "showing": "Showing"
+    },
+    "noMedia": "Your library is empty. Add your first media item!",
+    "bulkDelete": "Delete Selected",
+    "selectAll": "Select All"
+  },
+  "media": {
+    "title": "Title",
+    "type": "Type",
+    "origin": "Origin",
+    "author": "Author",
+    "releaseYear": "Release Year",
+    "rating": "Rating",
+    "pubStatus": "Publication Status",
+    "userStatus": "Your Status",
+    "tags": "Tags",
+    "urls": "Links",
+    "notes": "Notes",
+    "coverImage": "Cover Image URL",
+    "types": {
+      "movie": "Movie",
+      "book": "Book",
+      "comic": "Comic",
+      "game": "Game",
+      "music": "Music"
+    },
+    "origins": {
+      "vn": "Vietnam",
+      "cn": "China",
+      "jp": "Japan",
+      "kr": "Korea",
+      "us": "USA",
+      "uk": "UK",
+      "eu": "Europe",
+      "other": "Other"
+    },
+    "statuses": {
+      "planning": "Planning",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "dropped": "Dropped"
+    }
+  },
+  "collections": {
+    "title": "Collections",
+    "create": "New Collection",
+    "name": "Collection Name",
+    "color": "Color",
+    "items": "items",
+    "addMedia": "Add Media",
+    "removeMedia": "Remove Media",
+    "empty": "No collections yet. Create your first one!"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "distribution": "Distribution",
+    "topTags": "Top Tags",
+    "timeline": "Timeline",
+    "byType": "By Type",
+    "byOrigin": "By Origin",
+    "byPubStatus": "By Publication Status",
+    "byUserStatus": "By Your Status",
+    "added": "Added",
+    "completed": "Completed",
+    "lastMonths": "Last 6 months"
+  },
+  "agent": {
+    "title": "Librarian",
+    "newChat": "New Conversation",
+    "newConversation": "New Conversation",
+    "placeholder": "Ask me anything about your library...",
+    "inputPlaceholder": "Ask about your library, search the web, manage collections...",
+    "thinking": "Thinking...",
+    "executing": "Executing",
+    "step": "Step",
+    "callingTool": "Calling tool",
+    "planPreview": "Execution Plan",
+    "execute": "Execute",
+    "noConversations": "No conversations yet. Start a new one!",
+    "missingKeys": "Please add your API keys in Settings to use AI features.",
+    "welcomeTitle": "Libraria AI",
+    "welcomeDescription": "Your intelligent assistant for managing your media library. Ask me anything!",
+    "suggestions": {
+      "search": "Search my library for sci-fi books",
+      "add": "Add a new movie to my library",
+      "analyze": "Show my library statistics",
+      "web": "Search the web for trending books"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "language": "Language",
+    "langEn": "English",
+    "langVi": "Tiếng Việt",
+    "defaultView": "Default View",
+    "aiModel": "AI Model",
+    "apiKeys": "API Keys",
+    "geminiKey": "Gemini API Key",
+    "tavilyKey": "Tavily API Key",
+    "validateKey": "Validate",
+    "keyValid": "API key validated successfully",
+    "keyInvalid": "Invalid API key",
+    "keySaved": "API keys saved",
+    "profile": "Profile",
+    "displayName": "Display Name",
+    "avatar": "Avatar URL",
+    "deleteAccount": "Delete Account",
+    "deleteConfirm": "Are you sure? This action cannot be undone. This will permanently delete your account and all associated data."
+  },
+  "confirm": {
+    "title": "Are you sure?",
+    "description": "This action cannot be undone. This will permanently delete the data and cannot be recovered.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "notFound": "Page not found",
+    "unauthorized": "Please sign in to continue"
+  }
+}

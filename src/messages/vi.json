@@ -1,0 +1,206 @@
+{
+  "common": {
+    "appName": "Libraria",
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "close": "Đóng",
+    "search": "Tìm kiếm...",
+    "noResults": "Không tìm thấy kết quả",
+    "confirm": "Xác nhận",
+    "back": "Quay lại",
+    "next": "Tiếp",
+    "previous": "Trước"
+  },
+  "nav": {
+    "dashboard": "Tổng quan",
+    "library": "Thư viện",
+    "librarian": "Trợ lý AI",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất"
+  },
+  "auth": {
+    "signIn": "Đăng nhập",
+    "signInWithGoogle": "Đăng nhập bằng Google",
+    "signOut": "Đăng xuất",
+    "welcome": "Chào mừng đến với Libraria",
+    "tagline": "Bộ não thứ hai được hỗ trợ bởi AI để quản lý phương tiện"
+  },
+  "landing": {
+    "hero": {
+      "title": "Kho Lưu Trữ Phương Tiện Thông Minh",
+      "subtitle": "Theo dõi, sắp xếp và khám phá sách, truyện, phim, game và nhạc — được hỗ trợ bởi AI.",
+      "cta": "Bắt đầu với Google"
+    },
+    "features": {
+      "title": "Mọi thứ bạn cần",
+      "media": {
+        "title": "Quản lý Phương tiện",
+        "description": "Theo dõi sách, truyện, phim, game và nhạc tại một nơi."
+      },
+      "collections": {
+        "title": "Bộ sưu tập Thông minh",
+        "description": "Sắp xếp phương tiện vào các bộ sưu tập tùy chỉnh với mã màu."
+      },
+      "ai": {
+        "title": "Trợ lý AI",
+        "description": "Tương tác bằng ngôn ngữ tự nhiên cho mọi thao tác — tìm kiếm, lọc, quản lý."
+      },
+      "analytics": {
+        "title": "Phân tích Trực quan",
+        "description": "Hiểu rõ hơn về thói quen tiêu thụ phương tiện qua biểu đồ."
+      },
+      "search": {
+        "title": "Tìm kiếm Ngữ nghĩa",
+        "description": "Tìm phương tiện theo ý nghĩa, không chỉ từ khóa, nhờ AI embeddings."
+      },
+      "privacy": {
+        "title": "Ưu tiên Riêng tư",
+        "description": "Sử dụng API key của riêng bạn. Dữ liệu của bạn luôn thuộc về bạn."
+      }
+    }
+  },
+  "library": {
+    "title": "Thư viện",
+    "addMedia": "Thêm phương tiện",
+    "viewGrid": "Dạng lưới",
+    "viewList": "Dạng danh sách",
+    "filters": "Bộ lọc",
+    "sort": "Sắp xếp",
+    "sortBy": {
+      "titleAsc": "Tên (A-Z)",
+      "titleDesc": "Tên (Z-A)",
+      "ratingHigh": "Đánh giá (Cao-Thấp)",
+      "ratingLow": "Đánh giá (Thấp-Cao)",
+      "updatedNew": "Cập nhật (Mới nhất)",
+      "updatedOld": "Cập nhật (Cũ nhất)"
+    },
+    "pagination": {
+      "page": "Trang",
+      "of": "của",
+      "showing": "Hiển thị"
+    },
+    "noMedia": "Thư viện trống. Hãy thêm phương tiện đầu tiên!",
+    "bulkDelete": "Xóa đã chọn",
+    "selectAll": "Chọn tất cả"
+  },
+  "media": {
+    "title": "Tên",
+    "type": "Loại",
+    "origin": "Xuất xứ",
+    "author": "Tác giả",
+    "releaseYear": "Năm phát hành",
+    "rating": "Đánh giá",
+    "pubStatus": "Trạng thái xuất bản",
+    "userStatus": "Trạng thái của bạn",
+    "tags": "Thẻ",
+    "urls": "Liên kết",
+    "notes": "Ghi chú",
+    "coverImage": "URL ảnh bìa",
+    "types": {
+      "movie": "Phim",
+      "book": "Sách",
+      "comic": "Truyện",
+      "game": "Game",
+      "music": "Nhạc"
+    },
+    "origins": {
+      "vn": "Việt Nam",
+      "cn": "Trung Quốc",
+      "jp": "Nhật Bản",
+      "kr": "Hàn Quốc",
+      "us": "Mỹ",
+      "uk": "Anh",
+      "eu": "Châu Âu",
+      "other": "Khác"
+    },
+    "statuses": {
+      "planning": "Dự kiến",
+      "ongoing": "Đang theo dõi",
+      "completed": "Hoàn thành",
+      "dropped": "Bỏ dở"
+    }
+  },
+  "collections": {
+    "title": "Bộ sưu tập",
+    "create": "Tạo bộ sưu tập",
+    "name": "Tên bộ sưu tập",
+    "color": "Màu sắc",
+    "items": "mục",
+    "addMedia": "Thêm phương tiện",
+    "removeMedia": "Xóa phương tiện",
+    "empty": "Chưa có bộ sưu tập nào. Hãy tạo bộ sưu tập đầu tiên!"
+  },
+  "dashboard": {
+    "title": "Tổng quan",
+    "distribution": "Phân bổ",
+    "topTags": "Thẻ hàng đầu",
+    "timeline": "Dòng thời gian",
+    "byType": "Theo loại",
+    "byOrigin": "Theo xuất xứ",
+    "byPubStatus": "Theo trạng thái xuất bản",
+    "byUserStatus": "Theo trạng thái của bạn",
+    "added": "Đã thêm",
+    "completed": "Hoàn thành",
+    "lastMonths": "6 tháng gần nhất"
+  },
+  "agent": {
+    "title": "Trợ lý AI",
+    "newChat": "Cuộc trò chuyện mới",
+    "newConversation": "Cuộc trò chuyện mới",
+    "placeholder": "Hỏi tôi bất cứ điều gì về thư viện của bạn...",
+    "inputPlaceholder": "Hỏi về thư viện, tìm kiếm web, quản lý bộ sưu tập...",
+    "thinking": "Đang suy nghĩ...",
+    "executing": "Đang thực hiện",
+    "step": "Bước",
+    "callingTool": "Đang gọi công cụ",
+    "planPreview": "Kế hoạch thực hiện",
+    "execute": "Thực hiện",
+    "noConversations": "Chưa có cuộc trò chuyện nào. Hãy bắt đầu!",
+    "missingKeys": "Vui lòng thêm API key trong Cài đặt để sử dụng tính năng AI.",
+    "welcomeTitle": "Libraria AI",
+    "welcomeDescription": "Trợ lý thông minh giúp quản lý thư viện phương tiện. Hỏi tôi bất cứ điều gì!",
+    "suggestions": {
+      "search": "Tìm sách khoa học viễn tưởng trong thư viện",
+      "add": "Thêm một bộ phim mới vào thư viện",
+      "analyze": "Hiển thị thống kê thư viện",
+      "web": "Tìm kiếm sách đang thịnh hành trên web"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "theme": "Giao diện",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "language": "Ngôn ngữ",
+    "langEn": "English",
+    "langVi": "Tiếng Việt",
+    "defaultView": "Mặc định hiển thị",
+    "aiModel": "Mô hình AI",
+    "apiKeys": "API Keys",
+    "geminiKey": "Gemini API Key",
+    "tavilyKey": "Tavily API Key",
+    "validateKey": "Xác thực",
+    "keyValid": "API key hợp lệ",
+    "keyInvalid": "API key không hợp lệ",
+    "keySaved": "API keys đã lưu",
+    "profile": "Hồ sơ",
+    "displayName": "Tên hiển thị",
+    "avatar": "URL ảnh đại diện",
+    "deleteAccount": "Xóa tài khoản",
+    "deleteConfirm": "Bạn có chắc chắn? Hành động này không thể hoàn tác. Tài khoản và toàn bộ dữ liệu liên quan sẽ bị xóa vĩnh viễn."
+  },
+  "confirm": {
+    "title": "Bạn có chắc chắn?",
+    "description": "Hành động này không thể hoàn tác. Dữ liệu sẽ bị xóa vĩnh viễn và không thể khôi phục.",
+    "cancel": "Hủy",
+    "delete": "Xóa"
+  },
+  "errors": {
+    "generic": "Đã có lỗi xảy ra",
+    "notFound": "Không tìm thấy trang",
+    "unauthorized": "Vui lòng đăng nhập để tiếp tục"
+  }
+}
