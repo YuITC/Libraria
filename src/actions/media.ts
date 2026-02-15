@@ -18,6 +18,9 @@ export interface MediaQueryParams {
   tags?: string[];
   rating_min?: number;
   rating_max?: number;
+  year_min?: number;
+  year_max?: number;
+
   sort_by?:
     | "title_asc"
     | "title_desc"
@@ -50,9 +53,11 @@ export async function getMediaItems(params: MediaQueryParams = {}) {
     .select("*", { count: "exact" })
     .eq("user_id", user.id);
 
-  // Search (ILIKE on title)
+  // Search (ILIKE on title, author, notes)
   if (params.search) {
-    query = query.ilike("title", `%${params.search}%`);
+    query = query.or(
+      `title.ilike.%${params.search}%,author.ilike.%${params.search}%,notes.ilike.%${params.search}%`,
+    );
   }
 
   // Filters
@@ -76,6 +81,12 @@ export async function getMediaItems(params: MediaQueryParams = {}) {
   }
   if (params.rating_max !== undefined) {
     query = query.lte("rating", params.rating_max);
+  }
+  if (params.year_min !== undefined) {
+    query = query.gte("release_year", params.year_min);
+  }
+  if (params.year_max !== undefined) {
+    query = query.lte("release_year", params.year_max);
   }
 
   // Collection filter (join through collection_media)

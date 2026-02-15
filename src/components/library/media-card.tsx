@@ -1,8 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Star, BookOpen, Film, Gamepad2, Music, BookImage } from "lucide-react";
+import {
+  MoreVertical,
+  Edit2,
+  Trash2,
+  Loader2,
+  BookOpen,
+  Film,
+  Gamepad2,
+  Music,
+  BookImage,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useDeleteMedia } from "@/hooks/use-library";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { MediaItem } from "@/types/database";
 
@@ -25,209 +53,165 @@ const TYPE_COLORS: Record<string, string> = {
   comic: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
 };
 
+const MAX_VISIBLE_TAGS = 4;
+
 interface MediaCardProps {
   item: MediaItem;
-  view: "grid" | "list";
-  selected?: boolean;
-  onSelect?: (id: string) => void;
   onClick?: (item: MediaItem) => void;
+  onEdit?: (item: MediaItem) => void;
 }
 
-export function MediaCard({
-  item,
-  view,
-  selected,
-  onSelect,
-  onClick,
-}: MediaCardProps) {
+export function MediaCard({ item, onClick, onEdit }: MediaCardProps) {
   const t = useTranslations("media");
+  const tCommon = useTranslations("common");
+  const tConfirm = useTranslations("confirm");
+  const deleteMedia = useDeleteMedia();
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const TypeIcon = TYPE_ICONS[item.type] || BookOpen;
 
-  if (view === "list") {
-    return (
+  const handleDelete = async () => {
+    try {
+      await deleteMedia.mutateAsync(item.id);
+      toast.success(tCommon("delete"));
+      setDeleteOpen(false);
+    } catch {
+      toast.error("Error");
+    }
+  };
+
+  const visibleTags = item.tags.slice(0, MAX_VISIBLE_TAGS);
+  const remainingTagCount = item.tags.length - MAX_VISIBLE_TAGS;
+
+  return (
+    <>
       <div
-        className={cn(
-          "glass rounded-xl p-4 flex items-center gap-4 cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md group",
-          selected && "ring-2 ring-primary",
-        )}
+        className="glass rounded-xl overflow-hidden cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md group flex"
         onClick={() => onClick?.(item)}
       >
-        {/* Checkbox */}
-        {onSelect && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect(item.id);
-            }}
-            className={cn(
-              "w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors",
-              selected
-                ? "bg-primary border-primary text-primary-foreground"
-                : "border-border hover:border-primary/50",
-            )}
-          >
-            {selected && (
-              <svg
-                className="w-3 h-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={3}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            )}
-          </button>
-        )}
-
-        {/* Cover */}
-        <div className="w-12 h-16 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 overflow-hidden">
+        {/* Cover Image - Left ~30% */}
+        <div className="w-[30%] shrink-0 bg-muted/30 overflow-hidden">
           {item.cover_image_url ? (
             <img
               src={item.cover_image_url}
               alt={item.title}
-              className="w-full h-full object-cover rounded-lg"
+              className="w-full h-full object-cover transition-transform group-hover:scale-105"
             />
           ) : (
-            <TypeIcon className="w-5 h-5 text-muted-foreground" />
+            <div className="w-full h-full flex items-center justify-center min-h-[120px]">
+              <TypeIcon className="w-8 h-8 text-muted-foreground/30" />
+            </div>
           )}
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm truncate group-hover:text-primary transition-colors">
-            {item.title}
-          </h3>
-          <div className="flex items-center gap-2 mt-1">
+        {/* Info - Right ~70% */}
+        <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
+          {/* Line 1: Title + Author */}
+          <div className="min-w-0">
+            <h3 className="font-semibold text-sm truncate group-hover:text-primary transition-colors">
+              {item.title}
+            </h3>
             {item.author && (
-              <span className="text-xs text-muted-foreground truncate">
+              <p className="text-xs italic text-muted-foreground truncate mt-0.5">
                 {item.author}
-              </span>
+              </p>
             )}
           </div>
-        </div>
 
-        {/* Meta */}
-        <div className="hidden sm:flex items-center gap-2 shrink-0">
-          <Badge
-            variant="secondary"
-            className={cn("text-xs", TYPE_COLORS[item.type])}
-          >
-            <TypeIcon className="w-3 h-3 mr-1" />
-            {t(`types.${item.type}`)}
-          </Badge>
-          {item.user_status && (
-            <Badge variant="outline" className="text-xs">
-              {t(`statuses.${item.user_status}`)}
+          {/* Line 2: Type + Publication Status */}
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            <Badge
+              className={cn("text-[10px] px-1.5 py-0", TYPE_COLORS[item.type])}
+            >
+              <TypeIcon className="w-3 h-3 mr-0.5" />
+              {t(`types.${item.type}`)}
             </Badge>
+            {item.pub_status && (
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                {t(`statuses.${item.pub_status}`)}
+              </Badge>
+            )}
+          </div>
+
+          {/* Line 3: Tags */}
+          {item.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1 mt-2">
+              {visibleTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-1.5 py-0.5 rounded-md bg-muted/60 text-[10px] text-muted-foreground"
+                >
+                  {tag}
+                </span>
+              ))}
+              {remainingTagCount > 0 && (
+                <span className="text-[10px] text-muted-foreground">
+                  +{remainingTagCount} more
+                </span>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Rating */}
-        {item.rating !== null && item.rating !== undefined && (
-          <div className="flex items-center gap-1 shrink-0">
-            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            <span className="text-sm font-medium">{item.rating}</span>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Grid view
-  return (
-    <div
-      className={cn(
-        "glass rounded-xl overflow-hidden cursor-pointer transition-all hover:-translate-y-1 hover:shadow-lg group",
-        selected && "ring-2 ring-primary",
-      )}
-      onClick={() => onClick?.(item)}
-    >
-      {/* Cover Image */}
-      <div className="relative aspect-[3/4] bg-muted/30 overflow-hidden">
-        {item.cover_image_url ? (
-          <img
-            src={item.cover_image_url}
-            alt={item.title}
-            className="w-full h-full object-cover transition-transform group-hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <TypeIcon className="w-12 h-12 text-muted-foreground/30" />
-          </div>
-        )}
-
-        {/* Checkbox overlay */}
-        {onSelect && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect(item.id);
-            }}
-            className={cn(
-              "absolute top-2 left-2 w-6 h-6 rounded border-2 flex items-center justify-center transition-all",
-              selected
-                ? "bg-primary border-primary text-primary-foreground"
-                : "border-white/60 bg-black/20 backdrop-blur-sm opacity-0 group-hover:opacity-100",
-            )}
-          >
-            {selected && (
-              <svg
-                className="w-3.5 h-3.5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={3}
+        {/* Kebab Menu */}
+        <div className="shrink-0 p-2 flex items-start">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-muted/80 transition-all cursor-pointer"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            )}
-          </button>
-        )}
-
-        {/* Rating badge */}
-        {item.rating !== null && item.rating !== undefined && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-md bg-black/40 backdrop-blur-sm text-white text-xs font-medium">
-            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-            {item.rating}
-          </div>
-        )}
-
-        {/* Type badge */}
-        <div className="absolute bottom-2 left-2">
-          <Badge
-            className={cn("text-xs backdrop-blur-sm", TYPE_COLORS[item.type])}
-          >
-            <TypeIcon className="w-3 h-3 mr-1" />
-            {t(`types.${item.type}`)}
-          </Badge>
+                <MoreVertical className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="glass-strong">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.(item);
+                }}
+              >
+                <Edit2 className="w-3.5 h-3.5 mr-2" />
+                {tCommon("edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteOpen(true);
+                }}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-2" />
+                {tCommon("delete")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* Info */}
-      <div className="p-3">
-        <h3 className="font-semibold text-sm truncate group-hover:text-primary transition-colors">
-          {item.title}
-        </h3>
-        {item.author && (
-          <p className="text-xs text-muted-foreground truncate mt-1">
-            {item.author}
-          </p>
-        )}
-        {item.user_status && (
-          <Badge variant="outline" className="text-xs mt-2">
-            {t(`statuses.${item.user_status}`)}
-          </Badge>
-        )}
-      </div>
-    </div>
+      {/* Delete Confirmation */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="glass-strong">
+          <DialogHeader>
+            <DialogTitle>{tConfirm("title")}</DialogTitle>
+            <DialogDescription>{tConfirm("description")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+              {tConfirm("cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteMedia.isPending}
+            >
+              {deleteMedia.isPending && (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              )}
+              {tConfirm("delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

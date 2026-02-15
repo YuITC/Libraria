@@ -84,7 +84,13 @@
     },
     "noMedia": "Thư viện trống. Hãy thêm phương tiện đầu tiên!",
     "bulkDelete": "Xóa đã chọn",
-    "selectAll": "Chọn tất cả"
+    "selectAll": "Chọn tất cả",
+    "exportData": "Xuất dữ liệu",
+    "importData": "Nhập dữ liệu",
+    "exportSuccess": "Xuất dữ liệu thành công",
+    "importSuccess": "Nhập dữ liệu thành công",
+    "importInvalid": "Tệp không hợp lệ",
+    "data": "Dữ liệu"
   },
   "media": {
     "title": "Tên",

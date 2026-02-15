@@ -84,7 +84,13 @@
     },
     "noMedia": "Your library is empty. Add your first media item!",
     "bulkDelete": "Delete Selected",
-    "selectAll": "Select All"
+    "selectAll": "Select All",
+    "exportData": "Export Data",
+    "importData": "Import Data",
+    "exportSuccess": "Data exported successfully",
+    "importSuccess": "Data imported successfully",
+    "importInvalid": "Invalid import file format",
+    "data": "Data"
   },
   "media": {
     "title": "Title",
