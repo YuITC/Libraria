@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Plus, X, Loader2 } from "lucide-react";
 import {
@@ -86,6 +86,24 @@ export function MediaDialog({
     setNotes("");
   };
 
+  useEffect(() => {
+    if (editItem) {
+      setTitle(editItem.title);
+      setType(editItem.type);
+      setOrigin(editItem.origin || "");
+      setAuthor(editItem.author || "");
+      setReleaseYear(editItem.release_year?.toString() || "");
+      setRating(editItem.rating?.toString() || "");
+      setPubStatus(editItem.pub_status || "");
+      setUserStatus(editItem.user_status || "");
+      setSelectedTags(editItem.tags || []);
+      setCoverUrl(editItem.cover_image_url || "");
+      setNotes(editItem.notes || "");
+    } else {
+      resetForm();
+    }
+  }, [editItem]);
+
   const handleSubmit = async () => {
     if (!title.trim()) {
       toast.error("Title is required");
@@ -130,7 +148,7 @@ export function MediaDialog({
   const isPending = createMedia.isPending || updateMedia.isPending;
 
   const dialogContent = (
-    <DialogContent className="glass-strong max-w-2xl max-h-[90vh] overflow-y-auto">
+    <DialogContent className="glass-strong sm:max-w-4xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
         <DialogTitle>
           {isEditing ? tCommon("edit") : tLib("addMedia")}

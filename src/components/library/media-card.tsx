@@ -85,7 +85,7 @@ export function MediaCard({ item, onClick, onEdit }: MediaCardProps) {
   return (
     <>
       <div
-        className="glass rounded-xl overflow-hidden cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md group flex"
+        className="glass rounded-xl overflow-hidden cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md group flex h-[180px]"
         onClick={() => onClick?.(item)}
       >
         {/* Cover Image - Left ~30% */}
@@ -97,7 +97,7 @@ export function MediaCard({ item, onClick, onEdit }: MediaCardProps) {
               className="w-full h-full object-cover transition-transform group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center min-h-[120px]">
+            <div className="w-full h-full flex items-center justify-center min-h-[180px]">
               <TypeIcon className="w-8 h-8 text-muted-foreground/30" />
             </div>
           )}
@@ -107,7 +107,7 @@ export function MediaCard({ item, onClick, onEdit }: MediaCardProps) {
         <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
           {/* Line 1: Title + Author */}
           <div className="min-w-0">
-            <h3 className="font-semibold text-sm truncate group-hover:text-primary transition-colors">
+            <h3 className="font-semibold text-sm line-clamp-3 group-hover:text-primary transition-colors">
               {item.title}
             </h3>
             {item.author && (
@@ -120,13 +120,13 @@ export function MediaCard({ item, onClick, onEdit }: MediaCardProps) {
           {/* Line 2: Type + Publication Status */}
           <div className="flex flex-wrap items-center gap-1.5 mt-2">
             <Badge
-              className={cn("text-[10px] px-1.5 py-0", TYPE_COLORS[item.type])}
+              className={cn("text-[12px] px-2 py-0.5", TYPE_COLORS[item.type])}
             >
               <TypeIcon className="w-3 h-3 mr-0.5" />
               {t(`types.${item.type}`)}
             </Badge>
             {item.pub_status && (
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+              <Badge variant="outline" className="text-[12px] px-2 py-0.5">
                 {t(`statuses.${item.pub_status}`)}
               </Badge>
             )}
@@ -138,13 +138,13 @@ export function MediaCard({ item, onClick, onEdit }: MediaCardProps) {
               {visibleTags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-1.5 py-0.5 rounded-md bg-muted/60 text-[10px] text-muted-foreground"
+                  className="px-2 py-0.5 rounded-md bg-muted/80 text-[12px] text-muted-foreground"
                 >
                   {tag}
                 </span>
               ))}
               {remainingTagCount > 0 && (
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-[12px] text-muted-foreground">
                   +{remainingTagCount} more
                 </span>
               )}

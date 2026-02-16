@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { MoreVertical, Edit2, Trash2, Loader2 } from "lucide-react";
+import {
+  MoreVertical,
+  Edit2,
+  Trash2,
+  Loader2,
+  Folder,
+  Star,
+  Heart,
+  Bookmark,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,12 +31,14 @@ import { useDeleteCollection } from "@/hooks/use-library";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { CollectionWithCount } from "@/types/database";
+import { motion } from "framer-motion";
 
 interface CollectionCardProps {
-  collection: CollectionWithCount;
+  collection: CollectionWithCount & { icon?: string }; // Extend type locally if icon is missing from DB type
   isActive: boolean;
   onClick: () => void;
   onEdit: () => void;
+  compact?: boolean;
 }
 
 export function CollectionCard({
@@ -35,6 +46,7 @@ export function CollectionCard({
   isActive,
   onClick,
   onEdit,
+  compact,
 }: CollectionCardProps) {
   const tCommon = useTranslations("common");
   const tConfirm = useTranslations("confirm");
@@ -54,60 +66,120 @@ export function CollectionCard({
 
   return (
     <>
-      <div
+      <motion.div
+        layout
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         onClick={onClick}
         className={cn(
-          "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all",
-          isActive ? "ring-2 ring-primary bg-primary/8" : "hover:bg-muted/50",
+          "group relative rounded-xl cursor-pointer transition-all border overflow-hidden",
+          compact
+            ? "p-3 flex flex-col gap-2"
+            : "flex items-center gap-3 px-3 py-2.5",
+          isActive
+            ? "bg-primary/10 border-primary/20 text-primary shadow-sm"
+            : "border-transparent hover:bg-muted/50 text-muted-foreground hover:text-foreground",
         )}
       >
-        {/* Color indicator */}
+        {/* Icon / Color */}
         <div
-          className="w-8 h-8 rounded-lg shrink-0"
-          style={{ backgroundColor: collection.color }}
-        />
+          className={cn(
+            "flex justify-between items-start w-full",
+            compact ? "order-1" : "",
+          )}
+        >
+          <div
+            className={cn(
+              "rounded-lg shrink-0 flex items-center justify-center transition-colors",
+              compact ? "w-8 h-8" : "w-8 h-8",
+              isActive
+                ? "bg-primary text-primary-foreground shadow-inner"
+                : "bg-muted/50 text-muted-foreground group-hover:bg-muted group-hover:text-foreground",
+            )}
+            style={
+              collection.color && !isActive
+                ? {
+                    backgroundColor: `${collection.color}20`,
+                    color: collection.color,
+                  }
+                : {}
+            }
+          >
+            {collection.icon === "star" && <Star className="w-4 h-4" />}
+            {collection.icon === "heart" && <Heart className="w-4 h-4" />}
+            {collection.icon === "bookmark" && <Bookmark className="w-4 h-4" />}
+            {collection.icon === "folder" && <Folder className="w-4 h-4" />}
+            {!collection.icon && <Folder className="w-4 h-4" />}
+          </div>
+
+          {/* Item Count (moved for compact) */}
+          {compact && (
+            <span className="text-xs opacity-70 font-mono">
+              {collection.item_count || 0}
+            </span>
+          )}
+        </div>
 
         {/* Info */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{collection.name}</p>
-          <p className="text-xs text-muted-foreground">
-            {collection.item_count} {tCollections("items")}
+        <div className={cn("flex-1 min-w-0 z-10", compact ? "order-2" : "")}>
+          <p
+            className="text-sm font-medium truncate w-full"
+            title={collection.name}
+          >
+            {collection.name}
           </p>
+          {!compact && (
+            <p className="text-xs opacity-70">
+              {collection.item_count} {tCollections("items")}
+            </p>
+          )}
         </div>
 
         {/* Kebab menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              onClick={(e) => e.stopPropagation()}
-              className="opacity-0 group-hover:opacity-100 p-1 rounded-md hover:bg-muted/80 transition-all"
-            >
-              <MoreVertical className="w-4 h-4 text-muted-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="glass-strong">
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-              }}
-            >
-              <Edit2 className="w-3.5 h-3.5 mr-2" />
-              {tCommon("edit")}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                setDeleteOpen(true);
-              }}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="w-3.5 h-3.5 mr-2" />
-              {tCommon("delete")}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+        <div
+          className={cn(
+            "opacity-0 group-hover:opacity-100 transition-opacity z-20",
+            compact ? "absolute top-2 right-2" : "",
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 rounded-full hover:bg-background/80"
+              >
+                <MoreVertical className="w-3 h-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="glass-strong">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+              >
+                <Edit2 className="w-3.5 h-3.5 mr-2" />
+                {tCommon("edit")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteOpen(true);
+                }}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-2" />
+                {tCommon("delete")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </motion.div>
 
       {/* Delete Confirmation */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>

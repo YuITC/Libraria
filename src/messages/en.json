@@ -137,7 +137,8 @@
     "items": "items",
     "addMedia": "Add Media",
     "removeMedia": "Remove Media",
-    "empty": "No collections yet. Create your first one!"
+    "empty": "No collections yet. Create your first one!",
+    "newCollection": "New Collection"
   },
   "dashboard": {
     "title": "Dashboard",

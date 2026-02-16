@@ -145,9 +145,11 @@ export function CollectionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="glass-strong max-w-md max-h-[85vh] flex flex-col">
+      <DialogContent className="glass-strong sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{isEditing ? tCommon("edit") : t("create")}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? tCommon("edit") : t("newCollection")}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 flex-1 overflow-y-auto py-1">
@@ -167,7 +169,7 @@ export function CollectionFormDialog({
           {/* Color Picker */}
           <div className="space-y-2">
             <Label>{t("color")}</Label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 p-2">
               {COLLECTION_COLORS.map((c) => (
                 <button
                   key={c.value}

@@ -1,22 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import {
   Search,
   SlidersHorizontal,
   ArrowUpDown,
-  Plus,
   Database,
   X,
   Download,
   Upload,
-  Loader2,
+  Folder,
+  File,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   MEDIA_TYPES,
@@ -27,6 +26,8 @@ import {
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { MediaQueryParams } from "@/actions/media";
+import { CollectionPanel } from "./collection-panel";
+import type { CollectionWithCount } from "@/types/database";
 
 // =============================================================================
 // Types
@@ -67,17 +68,22 @@ interface BottomDockProps {
   filterYearMax?: number;
   onFilterYearMaxChange: (max?: number) => void;
   // Sort
+  // Sort
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
-  // Add
+  // Add Media
   onAddMedia: () => void;
+  // Collections
+  selectedCollectionId: string | null;
+  onSelectCollection: (id: string | null) => void;
   onAddCollection: () => void;
+  onEditCollection: (col: CollectionWithCount) => void;
   // Data
   onExport: () => void;
   onImport: () => void;
 }
 
-type ActivePanel = "search" | "filter" | "sort" | "add" | "data" | null;
+type ActivePanel = "search" | "filter" | "sort" | "collections" | "data" | null;
 
 export function BottomDock({
   searchValue,
@@ -103,7 +109,10 @@ export function BottomDock({
   sortBy,
   onSortChange,
   onAddMedia,
+  selectedCollectionId,
+  onSelectCollection,
   onAddCollection,
+  onEditCollection,
   onExport,
   onImport,
 }: BottomDockProps) {
@@ -197,7 +206,17 @@ export function BottomDock({
     >
       {/* Expanded panel above dock */}
       {activePanel && (
-        <div className="glass-strong rounded-2xl shadow-lg w-[min(90vw,540px)] animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div
+          className={cn(
+            "glass-strong rounded-2xl shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200",
+            activePanel === "search" && "w-[min(90vw,630px)]",
+            activePanel === "filter" && "w-[min(90vw,630px)]",
+            activePanel === "sort" && "w-[min(90vw,230px)]",
+            activePanel === "collections" &&
+              "w-[min(90vw,700px)] h-[min(60vh,500px)]",
+            activePanel === "data" && "w-[min(90vw,180px)]",
+          )}
+        >
           {/* Search Panel */}
           {activePanel === "search" && (
             <div className="p-3">
@@ -418,28 +437,24 @@ export function BottomDock({
             </div>
           )}
 
-          {/* Add Panel */}
-          {activePanel === "add" && (
-            <div className="p-3 space-y-1">
-              <button
-                onClick={() => {
-                  onAddMedia();
-                  setActivePanel(null);
-                }}
-                className="w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-muted/50 transition-colors cursor-pointer"
-              >
-                {t("addMedia")}
-              </button>
-              <button
-                onClick={() => {
-                  onAddCollection();
-                  setActivePanel(null);
-                }}
-                className="w-full text-left px-3 py-2.5 rounded-lg text-sm hover:bg-muted/50 transition-colors cursor-pointer"
-              >
-                {tCollections("create")}
-              </button>
-            </div>
+          {/* Collections Panel */}
+          {activePanel === "collections" && (
+            <CollectionPanel
+              selectedCollectionId={selectedCollectionId}
+              onSelectCollection={(id) => {
+                onSelectCollection(id);
+                // Optional: close panel on selection if desired, but keeping open is usually better for browsing
+              }}
+              onAddCollection={() => {
+                onAddCollection();
+                // Close panel to show clean dialog
+                setActivePanel(null);
+              }}
+              onEditCollection={(col) => {
+                onEditCollection(col);
+                setActivePanel(null);
+              }}
+            />
           )}
 
           {/* Data Panel */}
@@ -471,7 +486,7 @@ export function BottomDock({
       )}
 
       {/* Dock Bar */}
-      <div className="glass-strong rounded-2xl px-2 py-2 flex items-center gap-1 shadow-lg">
+      <div className="glass-strong rounded-2xl px-2 py-2 flex items-center gap-8 shadow-lg">
         <DockButton
           icon={Search}
           isActive={activePanel === "search" || !!searchValue}
@@ -492,10 +507,17 @@ export function BottomDock({
           label={t("sort")}
         />
         <DockButton
-          icon={Plus}
-          isActive={activePanel === "add"}
-          onClick={() => togglePanel("add")}
+          icon={File}
+          isActive={false} // Action button, no active state
+          onClick={onAddMedia}
           label={t("addMedia")}
+        />
+        <DockButton
+          icon={Folder}
+          isActive={activePanel === "collections"}
+          onClick={() => togglePanel("collections")}
+          label={tCollections("title")}
+          badge={selectedCollectionId ? 1 : undefined}
         />
         <DockButton
           icon={Database}

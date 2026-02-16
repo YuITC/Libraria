@@ -3,21 +3,24 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpen, Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useMediaItems, useCollections } from "@/hooks/use-library";
+import { importLibraryData } from "@/actions/import";
 import { MediaCard } from "@/components/library/media-card";
 import { MediaDialog } from "@/components/library/media-dialog";
 import { MediaDetailsModal } from "@/components/library/media-details-modal";
-import { CollectionSidebar } from "@/components/library/collection-sidebar";
 import { CollectionFormDialog } from "@/components/library/collection-form-dialog";
 import { BottomDock } from "@/components/library/bottom-dock";
 import { cn } from "@/lib/utils";
+import { getFullLibraryData } from "@/actions/export";
 import { toast } from "sonner";
-import type { MediaItem } from "@/types/database";
+import type { MediaItem, CollectionWithCount } from "@/types/database";
 import type { MediaQueryParams } from "@/actions/media";
 
 export function LibraryContent() {
   const t = useTranslations("library");
   const tCommon = useTranslations("common");
+  const queryClient = useQueryClient();
 
   // Search
   const [search, setSearch] = useState("");
@@ -49,6 +52,8 @@ export function LibraryContent() {
   const [detailItem, setDetailItem] = useState<MediaItem | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [addCollectionOpen, setAddCollectionOpen] = useState(false);
+  const [editCollection, setEditCollection] =
+    useState<CollectionWithCount | null>(null);
 
   // File import ref
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -109,12 +114,7 @@ export function LibraryContent() {
   // Export
   const handleExport = useCallback(async () => {
     try {
-      const exportData = {
-        version: 1,
-        exported_at: new Date().toISOString(),
-        media: mediaItems,
-        collections: collections || [],
-      };
+      const exportData = await getFullLibraryData();
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
         type: "application/json",
       });
@@ -125,10 +125,12 @@ export function LibraryContent() {
       a.click();
       URL.revokeObjectURL(url);
       toast.success(t("exportSuccess"));
-    } catch {
-      toast.error(tCommon("noResults"));
+    } catch (err: unknown) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      toast.error(tCommon("error") + ": " + message);
     }
-  }, [mediaItems, collections, t, tCommon]);
+  }, [t, tCommon]);
 
   // Import
   const handleImport = useCallback(() => {
@@ -149,23 +151,29 @@ export function LibraryContent() {
           return;
         }
 
-        // TODO: Implement actual import logic - create media items from data
-        toast.success(
-          `${t("importSuccess")}: ${data.media?.length || 0} media items`,
-        );
-      } catch {
+        const result = await importLibraryData(data);
+
+        if (result.success) {
+          toast.success(
+            `${t("importSuccess")}: ${result.mediaCount} media items`,
+          );
+          queryClient.invalidateQueries({ queryKey: ["media"] });
+          queryClient.invalidateQueries({ queryKey: ["collections"] });
+        }
+      } catch (error) {
+        console.error("Import error:", error);
         toast.error(t("importInvalid"));
       }
 
       // Reset file input
       if (fileInputRef.current) fileInputRef.current.value = "";
     },
-    [t],
+    [t, queryClient],
   );
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
-      {/* Main Content Area (~75%) */}
+      {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto pb-24">
         <div className="p-4 md:p-6 lg:p-8">
           {/* Loading state */}
@@ -183,7 +191,7 @@ export function LibraryContent() {
             /* Media Grid */
             <div
               className={cn(
-                "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4",
+                "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4",
                 isFetching && "opacity-60 pointer-events-none",
               )}
             >
@@ -199,12 +207,6 @@ export function LibraryContent() {
           )}
         </div>
       </div>
-
-      {/* Floating Collection Sidebar (~25%) */}
-      <CollectionSidebar
-        selectedCollectionId={selectedCollectionId}
-        onSelectCollection={handleCollectionSelect}
-      />
 
       {/* Floating Bottom Dock */}
       <BottomDock
@@ -231,7 +233,16 @@ export function LibraryContent() {
         sortBy={sortBy}
         onSortChange={setSortBy}
         onAddMedia={() => setAddMediaOpen(true)}
-        onAddCollection={() => setAddCollectionOpen(true)}
+        selectedCollectionId={selectedCollectionId}
+        onSelectCollection={handleCollectionSelect}
+        onAddCollection={() => {
+          setEditCollection(null);
+          setAddCollectionOpen(true);
+        }}
+        onEditCollection={(col) => {
+          setEditCollection(col);
+          setAddCollectionOpen(true);
+        }}
         onExport={handleExport}
         onImport={handleImport}
       />
@@ -273,10 +284,14 @@ export function LibraryContent() {
         triggerButton={false}
       />
 
-      {/* Add Collection Dialog */}
+      {/* Add/Edit Collection Dialog */}
       <CollectionFormDialog
         open={addCollectionOpen}
-        onOpenChange={setAddCollectionOpen}
+        onOpenChange={(open) => {
+          setAddCollectionOpen(open);
+          if (!open) setEditCollection(null);
+        }}
+        editCollection={editCollection}
       />
     </div>
   );

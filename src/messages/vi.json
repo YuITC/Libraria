@@ -137,7 +137,8 @@
     "items": "mục",
     "addMedia": "Thêm phương tiện",
     "removeMedia": "Xóa phương tiện",
-    "empty": "Chưa có bộ sưu tập nào. Hãy tạo bộ sưu tập đầu tiên!"
+    "empty": "Chưa có bộ sưu tập nào. Hãy tạo bộ sưu tập đầu tiên!",
+    "newCollection": "Bộ sưu tập mới"
   },
   "dashboard": {
     "title": "Tổng quan",
