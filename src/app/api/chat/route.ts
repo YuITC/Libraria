@@ -27,12 +27,12 @@ export async function POST(req: Request) {
   // Get Gemini API key from user's encrypted credentials
   const { data: profile } = await supabase
     .from("profiles")
-    .select("ai_credentials_encrypted, preferred_ai_model")
+    .select("ai_credentials_encrypted, ai_selected_model")
     .eq("id", user.id)
     .single();
 
   let geminiKey: string | undefined;
-  const modelId = profile?.preferred_ai_model || "gemini-2.5-flash";
+  const modelId = profile?.ai_selected_model || "gemini-2.0-flash";
 
   if (profile?.ai_credentials_encrypted) {
     try {

@@ -8,6 +8,7 @@ import { Send, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage, TypingIndicator } from "./chat-message";
+import { toast } from "sonner";
 import { saveMessage } from "@/actions/conversations";
 
 interface ChatPanelProps {
@@ -27,7 +28,7 @@ export function ChatPanel({
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [inputValue, setInputValue] = useState("");
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
     messages: initialMessages.map((m, i) => ({
       id: `init-${i}`,
@@ -40,6 +41,10 @@ export function ChatPanel({
         .map((p) => p.text)
         .join("");
       saveMessage(conversationId, "assistant", text).catch(() => {});
+    },
+    onError: (err) => {
+      console.error("AI Chat Error:", err);
+      toast.error(err.message || "An error occurred with the AI service");
     },
   });
 

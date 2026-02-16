@@ -123,7 +123,19 @@ export function Topbar({ user, locale }: TopbarProps) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                onClick={() => {
+                  const newTheme = theme === "dark" ? "light" : "dark";
+                  setTheme(newTheme);
+                  // Sync with server if user is logged in
+                  // We can't easily check auth here without proper context or prop drilling
+                  // But since Topbar is mostly used in protected routes, we can try to update
+                  // If it fails (not logged in), it's fine as client auth handles redirection
+                  import("@/actions/profile").then(({ updatePreferences }) => {
+                    updatePreferences({ theme: newTheme }).catch(() => {
+                      // Silent fail if not logged in or error
+                    });
+                  });
+                }}
                 className="rounded-lg"
                 aria-label="Toggle theme"
               >

@@ -66,7 +66,7 @@ export function AgentContent() {
   return (
     <div className="p-4 md:p-8 h-[calc(100vh-80px)] flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
+      {/* <div className="flex items-center gap-3 mb-4">
         <Button
           variant="ghost"
           size="icon"
@@ -83,7 +83,7 @@ export function AgentContent() {
           <Bot className="w-5 h-5 text-primary-foreground" />
         </div>
         <h1 className="text-2xl md:text-3xl font-bold">{t("title")}</h1>
-      </div>
+      </div> */}
 
       {/* Main Layout */}
       <div className="flex-1 flex gap-4 overflow-hidden min-h-0">

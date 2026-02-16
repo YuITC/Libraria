@@ -30,36 +30,36 @@
   },
   "landing": {
     "hero": {
+      "badge": "New: AI Agent v2.0",
       "title": "Your Intelligent Media Vault",
       "subtitle": "Track, organize, and explore your books, comics, movies, games, and music — powered by AI.",
-      "cta": "Get Started with Google"
+      "cta": "Get Started",
+      "secondaryCta": "Learn More"
     },
     "features": {
       "title": "Everything you need",
-      "media": {
-        "title": "Media Management",
-        "description": "Track books, comics, movies, games, and music in one place."
+      "smartOrg": {
+        "title": "Smart Organization",
+        "description": "Auto-tagging and categorization powered by AI."
       },
-      "collections": {
-        "title": "Smart Collections",
-        "description": "Organize your media into custom collections with color coding."
-      },
-      "ai": {
-        "title": "AI Agent",
-        "description": "Natural language interaction for all operations — search, filter, manage."
-      },
-      "analytics": {
-        "title": "Visual Analytics",
-        "description": "Insights into your media consumption patterns with charts."
-      },
-      "search": {
-        "title": "Semantic Search",
-        "description": "Find media by meaning, not just keywords, using AI embeddings."
+      "aiAnalysis": {
+        "title": "AI Analysis",
+        "description": "Deep insights into your library content."
       },
       "privacy": {
         "title": "Privacy First",
-        "description": "Bring your own API keys. Your data stays yours."
+        "description": "Local-first architecture. Your data stays yours."
+      },
+      "search": {
+        "title": "Universal Search",
+        "description": "Find anything instantly with semantic search."
       }
+    },
+
+    "cta": {
+      "title": "Ready to curate your collection?",
+      "subtitle": "Join thousands of users organizing their digital lives.",
+      "button": "Start for Free"
     }
   },
   "library": {

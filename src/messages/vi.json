@@ -30,36 +30,36 @@
   },
   "landing": {
     "hero": {
+      "badge": "Mới: AI Agent v2.0",
       "title": "Kho Lưu Trữ Phương Tiện Thông Minh",
       "subtitle": "Theo dõi, sắp xếp và khám phá sách, truyện, phim, game và nhạc — được hỗ trợ bởi AI.",
-      "cta": "Bắt đầu với Google"
+      "cta": "Bắt đầu ngay",
+      "secondaryCta": "Tìm hiểu thêm"
     },
     "features": {
       "title": "Mọi thứ bạn cần",
-      "media": {
-        "title": "Quản lý Phương tiện",
-        "description": "Theo dõi sách, truyện, phim, game và nhạc tại một nơi."
+      "smartOrg": {
+        "title": "Sắp xếp Thông minh",
+        "description": "Tự động gắn thẻ và phân loại bởi AI."
       },
-      "collections": {
-        "title": "Bộ sưu tập Thông minh",
-        "description": "Sắp xếp phương tiện vào các bộ sưu tập tùy chỉnh với mã màu."
-      },
-      "ai": {
-        "title": "Trợ lý AI",
-        "description": "Tương tác bằng ngôn ngữ tự nhiên cho mọi thao tác — tìm kiếm, lọc, quản lý."
-      },
-      "analytics": {
-        "title": "Phân tích Trực quan",
-        "description": "Hiểu rõ hơn về thói quen tiêu thụ phương tiện qua biểu đồ."
-      },
-      "search": {
-        "title": "Tìm kiếm Ngữ nghĩa",
-        "description": "Tìm phương tiện theo ý nghĩa, không chỉ từ khóa, nhờ AI embeddings."
+      "aiAnalysis": {
+        "title": "Phân tích AI",
+        "description": "Thông tin chi tiết về nội dung thư viện của bạn."
       },
       "privacy": {
         "title": "Ưu tiên Riêng tư",
-        "description": "Sử dụng API key của riêng bạn. Dữ liệu của bạn luôn thuộc về bạn."
+        "description": "Kiến trúc local-first. Dữ liệu của bạn là của bạn."
+      },
+      "search": {
+        "title": "Tìm kiếm Vạn năng",
+        "description": "Tìm bất cứ thứ gì ngay lập tức với tìm kiếm ngữ nghĩa."
       }
+    },
+
+    "cta": {
+      "title": "Sẵn sàng quản lý bộ sưu tập?",
+      "subtitle": "Tham gia cùng hàng ngàn người dùng đang tổ chức cuộc sống số của họ.",
+      "button": "Bắt đầu miễn phí"
     }
   },
   "library": {

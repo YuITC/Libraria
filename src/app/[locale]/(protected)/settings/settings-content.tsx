@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import {
-  Settings,
   Sun,
   Moon,
   Globe,
@@ -16,13 +15,10 @@ import {
   Save,
   Check,
   Loader2,
-  LayoutGrid,
-  List,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -51,7 +47,7 @@ interface SettingsContentProps {
     preferences: {
       theme: "light" | "dark";
       language: "en" | "vi";
-      default_view: "grid" | "list";
+      // default_view: "grid" | "list"; // Removed as per request
     };
     ai_selected_model: string;
   };
@@ -72,7 +68,7 @@ export function SettingsContent({
   const t = useTranslations("settings");
   const tCommon = useTranslations("common");
   const tConfirm = useTranslations("confirm");
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -87,11 +83,18 @@ export function SettingsContent({
   // Delete dialog
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const handleThemeChange = (theme: "light" | "dark") => {
-    setTheme(theme);
+  // Mount state for theme hydration mismatch prevention
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleThemeChange = (newTheme: "light" | "dark") => {
+    setTheme(newTheme);
+    // Sync with server only if user is logged in (implied by this page)
     startTransition(async () => {
       try {
-        await updatePreferences({ theme });
+        await updatePreferences({ theme: newTheme });
       } catch {
         toast.error(t("theme") + ": Error");
       }
@@ -105,17 +108,6 @@ export function SettingsContent({
         router.push(`/${language}/settings`);
       } catch {
         toast.error(t("language") + ": Error");
-      }
-    });
-  };
-
-  const handleViewChange = (view: "grid" | "list") => {
-    startTransition(async () => {
-      try {
-        await updatePreferences({ default_view: view });
-        toast.success(tCommon("save"));
-      } catch {
-        toast.error("Error");
       }
     });
   };
@@ -174,39 +166,35 @@ export function SettingsContent({
     });
   };
 
-  return (
-    <div className="p-4 md:p-8">
-      <div className="max-w-2xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
-            <Settings className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-        </div>
+  if (!mounted) return null;
 
+  return (
+    <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
+      {/* Group 1: Appearance (Theme - Language) */}
+      <h2 className="text-xl font-semibold mb-4 text-foreground/80">
+        Appearance
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Theme Section */}
-        <SettingsSection icon={Sun} title={t("theme")}>
+        <SettingsCard icon={Sun} title={t("theme")}>
           <div className="flex gap-3">
             <OptionButton
-              active={profile.preferences.theme === "light"}
+              active={theme === "light"}
               onClick={() => handleThemeChange("light")}
               icon={Sun}
               label={t("themeLight")}
             />
             <OptionButton
-              active={profile.preferences.theme === "dark"}
+              active={theme === "dark"}
               onClick={() => handleThemeChange("dark")}
               icon={Moon}
               label={t("themeDark")}
             />
           </div>
-        </SettingsSection>
-
-        <Separator className="opacity-50" />
+        </SettingsCard>
 
         {/* Language Section */}
-        <SettingsSection icon={Globe} title={t("language")}>
+        <SettingsCard icon={Globe} title={t("language")}>
           <div className="flex gap-3">
             <OptionButton
               active={locale === "en"}
@@ -219,33 +207,17 @@ export function SettingsContent({
               label={t("langVi")}
             />
           </div>
-        </SettingsSection>
+        </SettingsCard>
+      </div>
 
-        <Separator className="opacity-50" />
-
-        {/* Default View Section */}
-        <SettingsSection icon={LayoutGrid} title={t("defaultView")}>
-          <div className="flex gap-3">
-            <OptionButton
-              active={profile.preferences.default_view === "grid"}
-              onClick={() => handleViewChange("grid")}
-              icon={LayoutGrid}
-              label="Grid"
-            />
-            <OptionButton
-              active={profile.preferences.default_view === "list"}
-              onClick={() => handleViewChange("list")}
-              icon={List}
-              label="List"
-            />
-          </div>
-        </SettingsSection>
-
-        <Separator className="opacity-50" />
-
+      {/* Group 2: Intelligence (AI Model - API Keys) */}
+      <h2 className="text-xl font-semibold mb-4 pt-4 text-foreground/80">
+        Intelligence
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* AI Model Section */}
-        <SettingsSection icon={Bot} title={t("aiModel")}>
-          <div className="grid grid-cols-2 gap-3">
+        <SettingsCard icon={Bot} title={t("aiModel")}>
+          <div className="grid grid-cols-1 gap-3">
             {AI_MODELS.map((model) => (
               <OptionButton
                 key={model.value}
@@ -255,69 +227,65 @@ export function SettingsContent({
               />
             ))}
           </div>
-        </SettingsSection>
-
-        <Separator className="opacity-50" />
+        </SettingsCard>
 
         {/* API Keys Section */}
-        <SettingsSection icon={Key} title={t("apiKeys")}>
+        <SettingsCard icon={Key} title={t("apiKeys")}>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="gemini-key">{t("geminiKey")}</Label>
-              <div className="flex gap-2">
+              <div className="relative">
                 <Input
                   id="gemini-key"
                   type="password"
                   placeholder={
                     apiKeys.has_gemini
-                      ? apiKeys.gemini_key
+                      ? "••••••••••••••••"
                       : "Enter Gemini API key..."
                   }
                   value={geminiKey}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setGeminiKey(e.target.value)
                   }
-                  className="glass-subtle"
+                  className="glass-subtle pr-8"
                 />
+                {apiKeys.has_gemini && (
+                  <div className="absolute right-2 top-2.5 text-primary">
+                    <Check className="w-4 h-4" />
+                  </div>
+                )}
               </div>
-              {apiKeys.has_gemini && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Check className="w-3 h-3 text-primary" />
-                  Key saved
-                </p>
-              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="tavily-key">{t("tavilyKey")}</Label>
-              <div className="flex gap-2">
+              <div className="relative">
                 <Input
                   id="tavily-key"
                   type="password"
                   placeholder={
                     apiKeys.has_tavily
-                      ? apiKeys.tavily_key
+                      ? "••••••••••••••••"
                       : "Enter Tavily API key..."
                   }
                   value={tavilyKey}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setTavilyKey(e.target.value)
                   }
-                  className="glass-subtle"
+                  className="glass-subtle pr-8"
                 />
+                {apiKeys.has_tavily && (
+                  <div className="absolute right-2 top-2.5 text-primary">
+                    <Check className="w-4 h-4" />
+                  </div>
+                )}
               </div>
-              {apiKeys.has_tavily && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Check className="w-3 h-3 text-primary" />
-                  Key saved
-                </p>
-              )}
             </div>
 
             <Button
               onClick={handleSaveKeys}
               disabled={isPending || (!geminiKey && !tavilyKey)}
-              className="gradient-primary text-primary-foreground"
+              className="w-full gradient-primary text-primary-foreground"
             >
               {isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -327,12 +295,16 @@ export function SettingsContent({
               {tCommon("save")}
             </Button>
           </div>
-        </SettingsSection>
+        </SettingsCard>
+      </div>
 
-        <Separator className="opacity-50" />
-
+      {/* Group 3: Account (Profile - Logout - Delete) */}
+      <h2 className="text-xl font-semibold mb-4 pt-4 text-foreground/80">
+        Account
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Profile Section */}
-        <SettingsSection icon={User} title={t("profile")}>
+        <SettingsCard icon={User} title={t("profile")}>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="display-name">{t("displayName")}</Label>
@@ -362,7 +334,7 @@ export function SettingsContent({
             <Button
               onClick={handleSaveProfile}
               disabled={isPending}
-              className="gradient-primary text-primary-foreground"
+              className="w-full gradient-primary text-primary-foreground"
             >
               {isPending ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -372,46 +344,55 @@ export function SettingsContent({
               {tCommon("save")}
             </Button>
           </div>
-        </SettingsSection>
+        </SettingsCard>
 
-        <Separator className="opacity-50" />
-
-        {/* Danger Zone */}
-        <div className="glass rounded-xl p-6 border-destructive/20">
-          <h3 className="text-lg font-semibold text-destructive mb-4 flex items-center gap-2">
-            <Trash2 className="w-5 h-5" />
-            {t("deleteAccount")}
-          </h3>
-          <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-            <DialogTrigger asChild>
-              <Button variant="destructive">
-                <Trash2 className="w-4 h-4 mr-2" />
-                {t("deleteAccount")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="glass-strong">
-              <DialogHeader>
-                <DialogTitle>{tConfirm("title")}</DialogTitle>
-                <DialogDescription>{t("deleteConfirm")}</DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-                  {tConfirm("cancel")}
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteAccount}
-                  disabled={isPending}
-                >
-                  {isPending && (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  )}
-                  {tConfirm("delete")}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+        {/* Danger Section */}
+        <SettingsCard
+          icon={Trash2}
+          title="Danger Zone"
+          className="border-destructive/20"
+        >
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-muted-foreground">
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </p>
+            <div className="mt-auto">
+              <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="destructive" className="w-full">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    {t("deleteAccount")}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="glass-strong">
+                  <DialogHeader>
+                    <DialogTitle>{tConfirm("title")}</DialogTitle>
+                    <DialogDescription>{t("deleteConfirm")}</DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setDeleteOpen(false)}
+                    >
+                      {tConfirm("cancel")}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeleteAccount}
+                      disabled={isPending}
+                    >
+                      {isPending && (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      )}
+                      {tConfirm("delete")}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </SettingsCard>
       </div>
     </div>
   );
@@ -421,22 +402,24 @@ export function SettingsContent({
 // Sub-components
 // =============================================================================
 
-function SettingsSection({
+function SettingsCard({
   icon: Icon,
   title,
   children,
+  className,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   children: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="glass rounded-xl p-6">
+    <div className={cn("glass rounded-xl p-6 h-full flex flex-col", className)}>
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <Icon className="w-5 h-5 text-primary" />
         {title}
       </h3>
-      {children}
+      <div className="flex-1">{children}</div>
     </div>
   );
 }
@@ -456,7 +439,7 @@ function OptionButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all border",
+        "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all border w-full justify-center",
         active
           ? "border-primary bg-primary/10 text-primary"
           : "border-border bg-background/50 text-muted-foreground hover:text-foreground hover:border-foreground/20",
@@ -464,7 +447,7 @@ function OptionButton({
     >
       {Icon && <Icon className="w-4 h-4" />}
       {label}
-      {active && <Check className="w-3.5 h-3.5 ml-auto" />}
+      {active && <Check className="w-3.5 h-3.5 ml-1" />}
     </button>
   );
 }

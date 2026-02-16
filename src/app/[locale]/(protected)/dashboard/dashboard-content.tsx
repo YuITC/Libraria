@@ -32,12 +32,12 @@ export function DashboardContent() {
   return (
     <div className="p-4 md:p-8 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
+      {/* <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
           <BarChart3 className="w-5 h-5 text-primary-foreground" />
         </div>
         <h1 className="text-2xl md:text-3xl font-bold">{t("title")}</h1>
-      </div>
+      </div> */}
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
