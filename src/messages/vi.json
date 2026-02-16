@@ -151,7 +151,10 @@
     "byUserStatus": "Theo trạng thái của bạn",
     "added": "Đã thêm",
     "completed": "Hoàn thành",
-    "lastMonths": "6 tháng gần nhất"
+    "lastMonths": "6 tháng gần nhất",
+    "mostUsed": "Dùng nhiều nhất",
+    "leastUsed": "Dùng ít nhất",
+    "statisticsFor": "Thống kê năm {year}"
   },
   "agent": {
     "title": "Trợ lý AI",

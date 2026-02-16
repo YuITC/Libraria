@@ -165,12 +165,19 @@ export async function getDistributionByUserStatus(): Promise<
 // Top Tags (Bar Chart)
 // =============================================================================
 
+// =============================================================================
+// Top Tags (Bar Chart)
+// =============================================================================
+
 export interface TagData {
   tag: string;
   count: number;
 }
 
-export async function getTopTags(limit = 10): Promise<TagData[]> {
+export async function getTopTags(
+  limit = 10,
+  order: "most" | "least" = "most",
+): Promise<TagData[]> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -193,7 +200,7 @@ export async function getTopTags(limit = 10): Promise<TagData[]> {
 
   return Object.entries(counts)
     .map(([tag, count]) => ({ tag, count }))
-    .sort((a, b) => b.count - a.count)
+    .sort((a, b) => (order === "most" ? b.count - a.count : a.count - b.count))
     .slice(0, limit);
 }
 
@@ -207,55 +214,75 @@ export interface TimelineData {
   completed: number;
 }
 
-export async function getTimeline(months = 6): Promise<TimelineData[]> {
+export async function getTimeline(year?: number): Promise<TimelineData[]> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  // Generate month labels
-  const now = new Date();
-  const monthLabels: string[] = [];
-  for (let i = months - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    monthLabels.push(d.toISOString().slice(0, 7)); // "2026-01"
-  }
+  // Default to current year if not provided
+  const targetYear = year || new Date().getFullYear();
 
-  const startDate = monthLabels[0] + "-01";
+  // Create start and end timestamps in UTC that correspond to the start/end of the year in GMT+7
+  // GMT+7 is UTC+7.
+  // Start of year (GMT+7): YYYY-01-01 00:00:00
+  // -> UTC: (YYYY-1)-12-31 17:00:00
+  // End of year (GMT+7): YYYY-12-31 23:59:59.999
+  // -> UTC: YYYY-12-31 16:59:59.999
+
+  const startUtc = new Date(Date.UTC(targetYear - 1, 11, 31, 17, 0, 0));
+  const endUtc = new Date(Date.UTC(targetYear, 11, 31, 16, 59, 59, 999));
 
   // Fetch items created in range
   const { data: addedItems } = await supabase
     .from("media_items")
     .select("created_at")
-    .gte("created_at", startDate);
+    .gte("created_at", startUtc.toISOString())
+    .lte("created_at", endUtc.toISOString());
 
   // Fetch items completed in range
   const { data: completedItems } = await supabase
     .from("media_items")
     .select("completed_at")
     .not("completed_at", "is", null)
-    .gte("completed_at", startDate);
+    .gte("completed_at", startUtc.toISOString())
+    .lte("completed_at", endUtc.toISOString());
 
-  // Aggregate by month
-  const addedCounts: Record<string, number> = {};
-  const completedCounts: Record<string, number> = {};
+  // Helper to get month index (0-11) from UTC string adjusted to GMT+7
+  const getMonthIndexGMT7 = (dateStr: string) => {
+    const date = new Date(dateStr);
+    // Add 7 hours to convert to GMT+7 time
+    const gmt7Date = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+    return gmt7Date.getUTCMonth();
+  };
+
+  // Initialize all 12 months
+  const monthsData: TimelineData[] = Array.from({ length: 12 }, (_, i) => {
+    // Format: "YYYY-MM"
+    const monthStr = `${targetYear}-${String(i + 1).padStart(2, "0")}`;
+    return {
+      month: monthStr,
+      added: 0,
+      completed: 0,
+    };
+  });
 
   for (const item of addedItems || []) {
-    const month = item.created_at.slice(0, 7);
-    addedCounts[month] = (addedCounts[month] || 0) + 1;
+    const monthIndex = getMonthIndexGMT7(item.created_at);
+    if (monthsData[monthIndex]) {
+      monthsData[monthIndex].added++;
+    }
   }
 
   for (const item of completedItems || []) {
     if (item.completed_at) {
-      const month = item.completed_at.slice(0, 7);
-      completedCounts[month] = (completedCounts[month] || 0) + 1;
+      const monthIndex = getMonthIndexGMT7(item.completed_at);
+      if (monthsData[monthIndex]) {
+        monthsData[monthIndex].completed++;
+      }
     }
   }
 
-  return monthLabels.map((month) => ({
-    month,
-    added: addedCounts[month] || 0,
-    completed: completedCounts[month] || 0,
-  }));
+  return monthsData;
 }

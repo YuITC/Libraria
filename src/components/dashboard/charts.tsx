@@ -172,17 +172,45 @@ export function DistributionChart() {
 // Top Tags Bar Chart
 // =============================================================================
 
+// =============================================================================
+// Top Tags Bar Chart
+// =============================================================================
+
 export function TopTagsChart() {
   const t = useTranslations("dashboard");
-  const { data, isLoading } = useTopTags();
+  const [order, setOrder] = useState<"most" | "least">("most");
+  const { data, isLoading } = useTopTags(order);
 
   const chartData = (data || []).map((d) => ({
     name: d.tag,
     count: d.count,
   }));
 
+  const toggles = [
+    { key: "most" as const, label: t("mostUsed") },
+    { key: "least" as const, label: t("leastUsed") },
+  ];
+
   return (
     <ChartCard icon={Tag} title={t("topTags")} loading={isLoading}>
+      {/* Toggle buttons */}
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {toggles.map((tog) => (
+          <button
+            key={tog.key}
+            onClick={() => setOrder(tog.key)}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+              order === tog.key
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {tog.label}
+          </button>
+        ))}
+      </div>
+
       {chartData.length === 0 ? (
         <EmptyChart />
       ) : (
@@ -234,18 +262,19 @@ export function TopTagsChart() {
 
 export function TimelineChart() {
   const t = useTranslations("dashboard");
-  const { data, isLoading } = useTimeline();
+  const currentYear = new Date().getFullYear();
+  const { data, isLoading } = useTimeline(currentYear);
 
   const chartData = (data || []).map((d) => ({
     ...d,
-    monthLabel: formatMonth(d.month),
+    monthLabel: formatMonthName(d.month),
   }));
 
   return (
     <ChartCard
       icon={TrendingUp}
       title={t("timeline")}
-      subtitle={t("lastMonths")}
+      subtitle={t("statisticsFor", { year: currentYear })}
       loading={isLoading}
     >
       {chartData.length === 0 ? (
@@ -363,8 +392,9 @@ function EmptyChart() {
   );
 }
 
-function formatMonth(dateStr: string): string {
-  const [year, month] = dateStr.split("-");
+function formatMonthName(dateStr: string): string {
+  // dateStr is "YYYY-MM"
+  const [_, month] = dateStr.split("-");
   const months = [
     "Jan",
     "Feb",
@@ -379,5 +409,5 @@ function formatMonth(dateStr: string): string {
     "Nov",
     "Dec",
   ];
-  return `${months[parseInt(month) - 1]} ${year.slice(2)}`;
+  return months[parseInt(month) - 1];
 }

@@ -46,7 +46,7 @@ export function CollectionFormDialog({
   const removeMedia = useRemoveMediaFromCollection();
 
   const { data: mediaData } = useMediaItems({ sort_by: "title_asc" });
-  const allMedia = mediaData?.data || [];
+  const allMedia = mediaData?.pages.flatMap((page) => page.data) || [];
 
   const [name, setName] = useState("");
   const [color, setColor] = useState<string>(COLLECTION_COLORS[0].value);

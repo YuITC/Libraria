@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { BookOpen, Loader2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -90,11 +90,33 @@ export function LibraryContent() {
     ],
   );
 
-  const { data, isLoading, isFetching } = useMediaItems(queryParams);
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useMediaItems(queryParams);
   const { data: collections } = useCollections();
 
-  const mediaItems = data?.data || [];
-  const totalCount = data?.count || 0;
+  const mediaItems = useMemo(() => {
+    return data?.pages.flatMap((page) => page.data) || [];
+  }, [data?.pages]);
+
+  // Infinite scroll observer
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Handlers
   const handleItemClick = (item: MediaItem) => {
@@ -189,21 +211,34 @@ export function LibraryContent() {
             </div>
           ) : (
             /* Media Grid */
-            <div
-              className={cn(
-                "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4",
-                isFetching && "opacity-60 pointer-events-none",
-              )}
-            >
-              {mediaItems.map((item) => (
-                <MediaCard
-                  key={item.id}
-                  item={item}
-                  onClick={handleItemClick}
-                  onEdit={handleEditItem}
-                />
-              ))}
-            </div>
+            <>
+              <div
+                className={cn(
+                  "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4",
+                  // Remove isFetching check blocking interaction, only show opacity if reloading all
+                  isLoading && "opacity-60 pointer-events-none",
+                )}
+              >
+                {mediaItems.map((item) => (
+                  <MediaCard
+                    key={item.id}
+                    item={item}
+                    onClick={handleItemClick}
+                    onEdit={handleEditItem}
+                  />
+                ))}
+              </div>
+
+              {/* Infinite Scroll Loader */}
+              <div
+                ref={observerTarget}
+                className="h-10 flex items-center justify-center mt-4"
+              >
+                {isFetchingNextPage && (
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>

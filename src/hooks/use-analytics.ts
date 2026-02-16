@@ -42,18 +42,18 @@ export function useDistributionByUserStatus() {
   });
 }
 
-export function useTopTags() {
+export function useTopTags(order: "most" | "least" = "most") {
   return useQuery({
-    queryKey: ["analytics", "topTags"],
-    queryFn: () => getTopTags(10),
+    queryKey: ["analytics", "topTags", order],
+    queryFn: () => getTopTags(10, order),
     staleTime: 5 * 60 * 1000,
   });
 }
 
-export function useTimeline() {
+export function useTimeline(year?: number) {
   return useQuery({
-    queryKey: ["analytics", "timeline"],
-    queryFn: () => getTimeline(6),
+    queryKey: ["analytics", "timeline", year],
+    queryFn: () => getTimeline(year),
     staleTime: 5 * 60 * 1000,
   });
 }

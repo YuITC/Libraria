@@ -1,6 +1,11 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import {
   getMediaItems,
   createMediaItem,
@@ -24,9 +29,17 @@ import type { MediaItemCreate, MediaItemUpdate } from "@/types/database";
 // =============================================================================
 
 export function useMediaItems(params: MediaQueryParams = {}) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ["media", params],
-    queryFn: () => getMediaItems(params),
+    queryFn: ({ pageParam = 1 }) =>
+      getMediaItems({ ...params, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
     staleTime: 5 * 60 * 1000,
   });
 }

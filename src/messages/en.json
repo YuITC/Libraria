@@ -151,7 +151,10 @@
     "byUserStatus": "By Your Status",
     "added": "Added",
     "completed": "Completed",
-    "lastMonths": "Last 6 months"
+    "lastMonths": "Last 6 months",
+    "mostUsed": "Most Used",
+    "leastUsed": "Least Used",
+    "statisticsFor": "Statistics for {year}"
   },
   "agent": {
     "title": "Librarian",
